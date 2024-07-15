@@ -1,18 +1,27 @@
-/**
- * By default, Remix will handle hydrating your app on the client for you.
- * You are free to delete this file if you'd like to, but if you ever want it revealed again, you can run `npx remix reveal` ✨
- * For more information, see https://remix.run/file-conventions/entry.client
- */
-
+import i18next from "i18next";
+import { hydrate } from "react-dom";
+import { I18nextProvider, initReactI18next } from "react-i18next";
 import { RemixBrowser } from "@remix-run/react";
-import { startTransition, StrictMode } from "react";
-import { hydrateRoot } from "react-dom/client";
 
-startTransition(() => {
-  hydrateRoot(
-    document,
-    <StrictMode>
-      <RemixBrowser />
-    </StrictMode>
-  );
-});
+i18next
+  .use(initReactI18next)
+  .init({
+    supportedLngs: ["es", "en"],
+    defaultNS: "translations",
+    fallbackLng: "en",
+    // I recommend you to always disable react.useSuspense for i18next
+    react: { useSuspense: false },
+    detection: {
+      caches: ["cookie"],
+      lookupCookie: "lng",
+    },
+  })
+  .then(() => {
+    // then hydrate your app wrapped in the RemixI18NextProvider
+    return hydrate(
+      <I18nextProvider i18n={i18next}>
+        <RemixBrowser />
+      </I18nextProvider>,
+      document
+    );
+  });
